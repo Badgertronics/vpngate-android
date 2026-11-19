@@ -60,9 +60,8 @@ class SstpEngine : ProtocolEngine {
         val sslContext = SSLContext.getInstance("TLS")
         sslContext.init(null, trustAll, SecureRandom())
 
-        var socket: Socket? = null
         try {
-            socket = Socket()
+            val socket = Socket()
             vpnService.protect(socket)
             socket.connect(InetSocketAddress(host, port), 20000)
             socket.soTimeout = 15000

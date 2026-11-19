@@ -170,6 +170,8 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(this, VpnGateVpnService::class.java).apply {
             action = VpnGateVpnService.ACTION_CONNECT
             putExtra(VpnGateVpnService.EXTRA_PROTOCOL, protocol.code)
+            putExtra("server_ip", server.ip)
+            putExtra("server_host", server.hostname)
         }
         startService(intent)
     }

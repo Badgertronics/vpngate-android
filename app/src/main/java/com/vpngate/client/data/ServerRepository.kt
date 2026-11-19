@@ -117,15 +117,16 @@ class ServerRepository(private val context: Context, private val prefs: Preferen
             }
         }
 
-        if (fetchedList != null) {
+        val finalFetchedList = fetchedList
+        if (finalFetchedList != null) {
             // Preserve measured pings across refreshes!
-            for (server in fetchedList) {
+            for (server in finalFetchedList) {
                 val key = server.ip.ifEmpty { server.hostname }
                 if (previousPingMap.containsKey(key)) {
                     server.realPingMs = previousPingMap[key]
                 }
             }
-            _servers.value = fetchedList
+            _servers.value = finalFetchedList
             _isLoading.value = false
             return@withContext true
         }

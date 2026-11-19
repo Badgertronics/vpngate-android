@@ -46,10 +46,9 @@ class L2tpEngine : ProtocolEngine {
         isRunning.set(true)
 
         val serverAddr = InetAddress.getByName(host)
-        var socket: DatagramSocket? = null
 
         try {
-            socket = DatagramSocket()
+            val socket = DatagramSocket()
             vpnService.protect(socket)
             socket.soTimeout = 10000
             udpSocket = socket

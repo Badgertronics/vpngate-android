@@ -94,9 +94,8 @@ class OpenVpnEngine : ProtocolEngine {
         tunFd: FileDescriptor,
         emitLog: (String, Boolean) -> Unit
     ) = withContext(Dispatchers.IO) {
-        var socket: DatagramSocket? = null
         try {
-            socket = DatagramSocket()
+            val socket = DatagramSocket()
             vpnService.protect(socket)
             socket.soTimeout = 15000
             udpSocket = socket
@@ -224,9 +223,8 @@ class OpenVpnEngine : ProtocolEngine {
         tunFd: FileDescriptor,
         emitLog: (String, Boolean) -> Unit
     ) = withContext(Dispatchers.IO) {
-        var socket: Socket? = null
         try {
-            socket = Socket()
+            val socket = Socket()
             vpnService.protect(socket)
             socket.connect(InetSocketAddress(host, port), 20000)
             socket.soTimeout = 15000

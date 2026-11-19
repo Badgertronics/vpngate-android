@@ -54,9 +54,8 @@ class SoftEtherEngine : ProtocolEngine {
         sslContext.init(null, trustAll, SecureRandom())
         val factory: SSLSocketFactory = sslContext.socketFactory
 
-        var socket: Socket? = null
         try {
-            socket = Socket()
+            val socket = Socket()
             // CRITICAL: Protect socket so VPN routing does not intercept our tunnel traffic!
             vpnService.protect(socket)
 

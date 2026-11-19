@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.NetworkPing
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SystemUpdate
@@ -38,8 +39,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +68,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vpngate.client.data.Config
@@ -200,7 +203,7 @@ fun SettingsScreen(prefs: PreferencesManager) {
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
-                    Divider()
+                    HorizontalDivider()
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Watchdog Master Toggle
@@ -310,7 +313,72 @@ fun SettingsScreen(prefs: PreferencesManager) {
                 }
             }
 
-            // 4. Updates Section
+            // 4. VPN Protocols Section
+            SettingsSectionHeader(title = "VPN Clients", icon = Icons.Default.VpnKey)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Preferred Default Protocol", fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "Initial protocol selected when opening server details",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Protocol.ORDER.forEach { proto ->
+                            FilterChip(
+                                selected = defaultProtocol == proto,
+                                onClick = { prefs.setDefaultProtocol(proto) },
+                                label = { Text(proto.shortLabel, fontSize = 12.sp) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 5. Mirror Sites Section
+            SettingsSectionHeader(title = "Mirror Sites", icon = Icons.Default.Public)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        "${mirrors.size} Mirror URLs Configured",
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "Mirror endpoints used to fetch live server directory",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    mirrors.take(4).forEach { mirror ->
+                        Text(
+                            text = "• $mirror",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (mirrors.size > 4) {
+                        Text(
+                            text = "... and ${mirrors.size - 4} more",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            // 6. Updates Section
             SettingsSectionHeader(title = "Updates", icon = Icons.Default.SystemUpdate)
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -328,7 +396,7 @@ fun SettingsScreen(prefs: PreferencesManager) {
                         onClick = {
                             isCheckingUpdates = true
                             scope.launch(Dispatchers.IO) {
-                                checkForUpdates(context) { result ->
+                                checkForUpdates { result ->
                                     isCheckingUpdates = false
                                     updateDialogMessage = result
                                 }
@@ -539,7 +607,7 @@ private fun CryptoAddressRow(context: Context, coinName: String, address: String
     }
 }
 
-private fun checkForUpdates(context: Context, onResult: (String) -> Unit) {
+private fun checkForUpdates(onResult: (String) -> Unit) {
     val client = OkHttpClient()
     for (url in Config.RELEASE_API_MIRRORS) {
         try {

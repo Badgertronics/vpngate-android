@@ -148,7 +148,7 @@ class VpnGateVpnService : VpnService() {
 
     private fun handleConnectivityLost() {
         EventBus.log("Service", "Watchdog triggered connectivity loss. Re-evaluating tunnel...", isError = true)
-        disconnect(userInitiated = false)
+        currentEngine?.disconnect()
     }
 
     private fun handleTunnelEnded() {
@@ -203,7 +203,7 @@ class VpnGateVpnService : VpnService() {
     }
 
     private fun disconnect(userInitiated: Boolean) {
-        manualDisconnectRequested.set(true)
+        manualDisconnectRequested.set(userInitiated)
         watchdog?.stop()
         statsJob?.cancel()
         statsJob = null
