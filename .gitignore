@@ -13,4 +13,6 @@ local.properties
 *.aab
 *.ap_
 .kotlin
+dist_release/
+
 
