@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#1565C0</color>
+    <color name="primary_dark">#0D47A1</color>
+    <color name="accent">#00B0FF</color>
+    <color name="surface_dark">#121212</color>
+    <color name="surface_light">#FAFAFA</color>
+    <color name="ping_green">#4CAF50</color>
+    <color name="ping_yellow">#FFC107</color>
+    <color name="ping_orange">#FF9800</color>
+    <color name="ping_red">#F44336</color>
+</resources>
