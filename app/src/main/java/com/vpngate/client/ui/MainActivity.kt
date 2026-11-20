@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -173,6 +174,10 @@ class MainActivity : ComponentActivity() {
             putExtra("server_ip", server.ip)
             putExtra("server_host", server.hostname)
         }
-        startService(intent)
+        try {
+            ContextCompat.startForegroundService(this, intent)
+        } catch (e: Exception) {
+            EventBus.log("App", "Failed to start VPN foreground service: ${e.message}", isError = true)
+        }
     }
 }

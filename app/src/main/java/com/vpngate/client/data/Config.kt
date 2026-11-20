@@ -3,7 +3,7 @@ package com.vpngate.client.data
 object Config {
     const val APP_NAME = "VPN Gate"
     const val APP_ID = "com.vpngate.client"
-    const val VERSION = "1.0.0"
+    const val VERSION = "1.0.1"
 
     // Default VPN credentials for all public VPN Gate relays
     const val VPN_USERNAME = "vpn"

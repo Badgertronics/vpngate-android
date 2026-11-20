@@ -270,13 +270,41 @@ object CountryData {
         return text.replace(Regex("\\s+"), " ").trim()
     }
 
+    private val COUNTRY_ALIASES: Map<String, Pair<String, String>> = mapOf(
+        "hrvatska" to Pair("Croatia", "HR"),
+        "republika hrvatska" to Pair("Croatia", "HR"),
+        "croatia" to Pair("Croatia", "HR"),
+        "croatia (local name hrvatska)" to Pair("Croatia", "HR"),
+        "belarus" to Pair("Belarus", "BY"),
+        "byelorus" to Pair("Belarus", "BY"),
+        "byelorussia" to Pair("Belarus", "BY"),
+        "republic of belarus" to Pair("Belarus", "BY"),
+        "thailand" to Pair("Thailand", "TH"),
+        "ailand" to Pair("Thailand", "TH"),
+        "hailand" to Pair("Thailand", "TH"),
+        "india" to Pair("India", "IN"),
+        "ndia" to Pair("India", "IN"),
+        "dia" to Pair("India", "IN"),
+        "iran" to Pair("Iran", "IR"),
+        "ran" to Pair("Iran", "IR"),
+        "taiwan" to Pair("Taiwan", "TW"),
+        "aiwan" to Pair("Taiwan", "TW")
+    )
+
     fun normalizeCountry(rawCountry: String, rawCode: String): Pair<String, String> {
         var code = rawCode.trim().uppercase()
         var name = cleanString(rawCountry)
 
+        val alias = COUNTRY_ALIASES[name.lowercase()]
+        if (alias != null) {
+            return Pair(alias.first, if (code.isNotEmpty()) code else alias.second)
+        }
+
         val canonical = COUNTRY_NAMES[code]
         if (canonical != null) {
             if (name.isEmpty() || name.uppercase() == code) {
+                name = canonical
+            } else if (code in setOf("HR", "BY", "TH", "IN", "IR", "TW", "VN", "KR", "RU", "US", "GB", "JP")) {
                 name = canonical
             } else if (canonical.lowercase().endsWith(name.lowercase())) {
                 // Fix corrupted names where leading letters were sliced off

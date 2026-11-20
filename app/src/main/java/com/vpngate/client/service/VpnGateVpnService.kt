@@ -1,8 +1,11 @@
 package com.vpngate.client.service
 
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.net.VpnService
+import android.os.Build
 import android.os.ParcelFileDescriptor
+import androidx.core.app.ServiceCompat
 import com.vpngate.client.VpnGateApplication
 import com.vpngate.client.data.Config
 import com.vpngate.client.data.ConnectionState
@@ -28,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class VpnGateVpnService : VpnService() {
 
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var connectionJob: Job? = null
     private var statsJob: Job? = null
     private var tunInterface: ParcelFileDescriptor? = null
@@ -192,14 +195,27 @@ class VpnGateVpnService : VpnService() {
     }
 
     private fun updateNotification(state: ConnectionState, stats: TrafficStats) {
-        val notification = NotificationHelper.buildNotification(
-            this,
-            state,
-            activeServer,
-            selectedProtocol,
-            stats
-        )
-        startForeground(NotificationHelper.NOTIFICATION_ID, notification)
+        try {
+            val notification = NotificationHelper.buildNotification(
+                this,
+                state,
+                activeServer,
+                selectedProtocol,
+                stats
+            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ServiceCompat.startForeground(
+                    this,
+                    NotificationHelper.NOTIFICATION_ID,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                )
+            } else {
+                startForeground(NotificationHelper.NOTIFICATION_ID, notification)
+            }
+        } catch (e: Exception) {
+            EventBus.log("Service", "Foreground notification warning: ${e.message}", isError = false)
+        }
     }
 
     private fun disconnect(userInitiated: Boolean) {
